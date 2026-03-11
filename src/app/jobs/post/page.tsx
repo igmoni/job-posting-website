@@ -1,138 +1,133 @@
 "use client";
-import React, { FormEvent, useCallback } from "react";
+import React, { useCallback } from "react";
 
 const page = () => {
-  const handleSubmit = useCallback(async (e: SubmitEvent) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-    const data = {};
-  }, []);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        title: formData.get("title"),
+        company: formData.get("company"),
+        location: formData.get("location"),
+        type: formData.get("type"),
+        description: formData.get("description"),
+        salary: formData.get("salary"),
+      };
+      console.log(data);
+      try {
+        await fetch("/api/jobs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "applcation/json",
+          },
+          body: JSON.stringify(data),
+        });
+        window.location.href = "/jobs";
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [],
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-6">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-semibold text-gray-900 text-center mb-10">
-          Post a Job
-        </h1>
+    <div className="flex min-h-screen items-center justify-center bg-slate-100">
+      <form
+        onSubmit={handleSubmit}
+        className="w-125 rounded-lg bg-white p-8 shadow-md space-y-5"
+      >
+        <h1 className="text-xl font-semibold text-center">Post a Job</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-lg rounded-2xl border border-gray-200 p-8 space-y-6"
-        >
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Job Title
-            </label>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="title" className="text-sm font-medium">
+            Job Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            required
+            className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <input
-              type="text"
-              name="title"
-              id="title"
-              required
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="company" className="text-sm font-medium">
+            Company
+          </label>
+          <input
+            type="text"
+            name="company"
+            id="company"
+            required
+            className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-          <div>
-            <label
-              htmlFor="company"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Company
-            </label>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="location" className="text-sm font-medium">
+            Location
+          </label>
+          <input
+            type="text"
+            name="location"
+            id="location"
+            required
+            className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <input
-              type="text"
-              name="company"
-              id="company"
-              required
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="location"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Location
-            </label>
-
-            <input
-              type="text"
-              name="location"
-              id="location"
-              required
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="type"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Job Type
-            </label>
-
-            <select
-              name="type"
-              id="type"
-              required
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="">Select a type</option>
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
-              <option value="Contract">Contract</option>
-              <option value="Internship">Internship</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-
-            <textarea
-              name="description"
-              id="description"
-              rows={6}
-              required
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="salary"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Salary (optional)
-            </label>
-
-            <input
-              type="text"
-              name="salary"
-              id="salary"
-              className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-          <button
-            type="submit"
-            className="mx-auto block rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        <div className="flex flex-col gap-1">
+          <label htmlFor="type" className="text-sm font-medium">
+            Job Type
+          </label>
+          <select
+            name="type"
+            id="type"
+            required
+            className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Post Job
-          </button>
-        </form>
-      </div>
+            <option value="">Select a type</option>
+            <option value="Full-time">Full-time</option>
+            <option value="Part-time">Part-time</option>
+            <option value="Contract">Contract</option>
+            <option value="Internship">Internship</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="description" className="text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            name="description"
+            id="description"
+            rows={5}
+            required
+            className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="salary" className="text-sm font-medium">
+            Salary (optional)
+          </label>
+          <input
+            type="text"
+            name="salary"
+            id="salary"
+            className="border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700"
+        >
+          Post Job
+        </button>
+      </form>
     </div>
   );
 };
