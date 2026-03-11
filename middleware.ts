@@ -1,3 +1,3 @@
 import { auth } from "./auth";
 
-export {auth as middlware}
+export { auth as middleware };
