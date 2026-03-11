@@ -1,38 +1,75 @@
+"use client";
+
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
-const navItems = [
-  { href: "/jobs", label: "Browse jobs" },
-  { href: "/jobs/post", label: "Post a job" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/auth/signin", label: "Sign in" },
+type AuthVisibility = "all" | "user" | "guest";
+
+type NavItem = {
+  label: string;
+  href?: string;
+  visibility: AuthVisibility;
+  action?: "logout";
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "Browse Jobs", href: "/jobs", visibility: "all" },
+  { label: "Post a Job", href: "/jobs/post", visibility: "user" },
+  { label: "Dashboard", href: "/dashboard", visibility: "user" },
+  { label: "Sign Out", visibility: "user", action: "logout" },
+  { label: "Sign In", href: "/auth/signin", visibility: "guest" },
 ];
 
-const Navbar = () => {
-  return (
-    <nav className="flex justify-center py-4">
-      <div className="flex items-center justify-between w-full max-w-5xl">
-        <div>
-          <Link href={"/"} className="flex items-center space-x-2">
-            <Image width={40} height={40} src={"/logo.png"} alt="Logo" />
-            <span>Job Board</span>
-          </Link>
-        </div>
+export function Navbar() {
+  const { data: session, status } = useSession();
 
-        <div className="flex space-x-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-neutral-800/70 hover:bg-neutral-100 px-2 py-1 hover:border border-neutral-400/50 rounded-lg hover:text-black transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
+  const isAuthenticated = !!session;
+
+  const visibleItems = NAV_ITEMS.filter((item) => {
+    if (item.visibility === "all") return true;
+    if (item.visibility === "user") return isAuthenticated;
+    if (item.visibility === "guest") return !isAuthenticated;
+    return false;
+  });
+
+  return (
+    <nav className="flex justify-center py-4 border-b border-neutral-200">
+      <div className="flex items-center justify-between w-full max-w-5xl px-4">
+        
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" width={40} height={40} alt="Logo" />
+          <span className="font-semibold text-lg">Job Board</span>
+        </Link>
+
+        {/* Nav Links */}
+        <div className="flex items-center gap-4">
+          {visibleItems.map((item) => {
+            if (item.action === "logout") {
+              return (
+                <button
+                  key="logout"
+                  onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                  className="text-neutral-700 hover:text-black transition"
+                >
+                  {item.label}
+                </button>
+              );
+            }
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href!}
+                className="text-neutral-700 hover:text-black transition"
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>
   );
-};
-
-export { Navbar };
+}
